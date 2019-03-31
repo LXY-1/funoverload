@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>重载函数</title>
+</head>
+
+<body>
+
+    <div class="button-wrap" id='button-wrap'>
+        <button>查询全部</button>
+        <button>查询姓Liu的</button>
+        <button>查询姓Liu的,且性别是男的</button>
+    </div>
+    <div class="info" id='info'>
+        <p>
+            <span>Liu xiaowei </span>
+            <span>性别：男</span>
+        </p>
+    </div>
+
+
+    <script src="./js/Overload.js"></script>
+    <script>
+        // 使用bindOverloads
+        console.log(bindOverloads);
+
+        // 假数据
+        var data = [{
+                name: 'Liu Xiaowei',
+                sex: 0, // 0是男的
+            },
+            {
+                name: 'Liu Xiaoli',
+                sex: 1, // 1是女的
+            },
+            {
+                name: 'Liu Xiaoqiang',
+                sex: 0, // 0是男的
+            },
+            {
+                name: 'Zhang Xiaoqiang',
+                sex: 0, // 0是男的
+            },
+        ]
+
+        var people = {};
+        people.student = data;
+
+        // 不传参数时，返回所有name
+        function find0() {
+            return this.student;
+        }
+
+
+        // 传一个参数时，返回firstName匹配的name
+        function find1(firstName) {
+            var result = [];
+            for (var i = 0; i < this.student.length; i++) {
+                if (this.student[i].name.indexOf(firstName) === 0) {
+                    result.push(this.student[i]);
+                }
+            }
+            return result;
+        }
+
+
+        // 传两个参数时，返回firstName和sex都匹配的name
+        function find2(firstName, sex) {
+            var result = [];
+            for (var i = 0; i < this.student.length; i++) {
+                if (this.student[i].name.indexOf(firstName) === 0 && this.student[i].sex === sex) {
+                    result.push(this.student[i]);
+                }
+            }
+            return result;
+        }
+
+
+        // 给people绑定需要重载的finid属性
+        bindOverloads(people,'find',find0);
+        bindOverloads(people,'find',find1);
+        bindOverloads(people,'find',find2);
+
+        console.log(people.find());
+        console.log(people.find('Liu',0));
+
+        var buttons = document.getElementById('button-wrap').getElementsByTagName('button');
+
+        buttons[0].onclick = function () {
+            var info = people.find();
+            showData(info);
+        }
+
+        buttons[1].onclick = function () {
+            var info = people.find('Liu');
+            showData(info);
+        }
+
+        buttons[2].onclick = function () {
+            var info = people.find('Liu',0);
+            showData(info);
+        }
+
+        /**
+         * @description: 数据渲染到页面：dom操作
+         * @param {type} 
+         * @return: 
+         */
+        function showData(info){
+            var infoWrap = document.getElementById('info');
+            infoWrap.innerHTML = '';
+            var sexs = ['男','女'];
+            for(let i = 0; i< info.length; i++){
+                let ele1 = document.createElement('p');
+                let ele2 = document.createElement('span');
+                let ele3 = document.createElement('span');
+                ele2.innerText = `姓名:${info[i].name}`;
+                ele3.innerText = `性别:${sexs[info[i].sex]}`;
+                ele1.append(ele2);
+                ele1.append(ele3);
+                infoWrap.append(ele1);
+            }
+        }
+        
+
+    </script>
+</body>
+
+</html>
